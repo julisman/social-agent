@@ -143,4 +143,7 @@ the keyword logic, seeker-vs-seller heuristics and reply voice do not. Rewrite t
 
 ## License
 
-MIT. No warranty — you are responsible for what this does from your accounts.
+Apache 2.0 — see [LICENSE](LICENSE). No warranty.
+
+You are responsible for what this does from your accounts, including anything it posts
+publicly and any action a platform takes in response.

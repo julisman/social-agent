@@ -102,13 +102,66 @@ touch PAUSED     # every skill checks this before opening a tab
 rm PAUSED
 ```
 
+## Running it unattended
+
+Add a `schedule` block to `config.json` (see `config.example.json`), then run **one**
+loop on your shortest interval:
+
+```
+/loop 30m Run bin/due.sh. For each skill it lists, invoke that skill for that brand.
+If social-prospect collects any HIGH-intent leads and budget remains, run social-engage
+straight after. If bin/due.sh prints nothing, reply "nothing due" and stop — do not
+open a browser. Finish with one line from bin/status.sh.
+```
+
+**One loop, not one per skill.** Separate loops mean separate sessions driving the same
+Chrome tab group, and two skills mid-reply in the same browser is a real corruption
+risk. `bin/due.sh` is the dispatcher: it reads the clock and the audit log, and prints
+what is actually due.
+
+**It measures elapsed time, not ticks.** Sleep the machine, restart the loop, miss ten
+intervals — whatever is overdue fires once on the next tick. A tick-counter would drift
+and never recover, and you would have no way to tell.
+
+```sh
+bin/due.sh          # what would run right now, and why
+bin/status.sh       # budget, today's actions, waiting leads, open escalations
+watch -n 30 bin/status.sh
+```
+
+**Pause without touching the loop:**
+
+```sh
+touch PAUSED        # due.sh returns nothing; every skill exits at its guard
+rm PAUSED
+```
+
+That is safer than interrupting a running loop, which can land between "reply sent" and
+"reply recorded" — and an unrecorded reply is the one failure that lets the same person
+be replied to twice.
+
+### If you add a skill
+
+End every run by logging a marker, **even when the skill did nothing**:
+
+```sh
+echo '{"brand":"...","platform":"...","kind":"run","skill":"your-skill","note":"..."}' | bin/log-action.sh
+```
+
+`due.sh` reads these to work out when the skill last ran. Miss it and the dispatcher
+sees "never run", fires the skill every single tick, and it looks idle the whole time.
+An empty inbox is still a run.
+
+`social-engage` deliberately has no schedule — it is triggered by prospecting finding
+something. On a clock it would just burn budget checks against an empty lead list.
+
 ## Layout
 
 ```
 config.json            your settings — GITIGNORED
 config.example.json    template, documented
 CLAUDE.md              operating rules, always loaded
-bin/                   the guardrails
+bin/                   the guardrails + due.sh (dispatcher) and status.sh (monitor)
 brands/_example/       brand kit template
 brands/<slug>/         your real kits — GITIGNORED
 data/                  leads, dedupe keys, audit log — GITIGNORED

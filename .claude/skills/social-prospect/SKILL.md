@@ -155,8 +155,12 @@ overlaps the last run is useful signal about whether your keywords are exhausted
 Log the run and report:
 
 ```sh
-echo '{"brand":"...","platform":"...","kind":"prospect_run","note":"12 high, 8 medium, 31 rejected"}' | bin/log-action.sh
+echo '{"brand":"...","platform":"...","kind":"run","skill":"social-prospect",
+       "note":"12 high, 8 medium, 31 rejected"}' | bin/log-action.sh
 ```
+
+**Log this even if you found nothing.** `bin/due.sh` uses it to work out when this
+skill last ran; without it a scheduled loop re-fires the same skill every tick.
 
 Report to the user: counts by tier, which queries produced the most, which produced
 nothing (those should be retired), and anything that looked like a new phrasing worth

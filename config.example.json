@@ -28,6 +28,16 @@
     ]
   },
 
+  "schedule": {
+    "_note": "Used by bin/due.sh to decide what to run in a loop. DM first on purpose: answering someone who already contacted you beats going looking for someone who hasn't.",
+    "working_hours": { "start": 8, "end": 21, "days": [1, 2, 3, 4, 5, 6, 7] },
+    "every_minutes": {
+      "social-dm": 30,
+      "social-prospect": 60,
+      "social-comments": 180
+    }
+  },
+
   "brands": {
     "example-scooter-rental": {
       "display_name": "Example Scooter Rental",

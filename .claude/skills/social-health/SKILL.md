@@ -61,7 +61,10 @@ Write the result into today's `reports/YYYY-MM-DD.md` and log it:
 
 ```sh
 echo '{"brand":"...","platform":"...","kind":"health_check","note":"3/3 visible logged-out, 12% response rate, no blocks"}' | bin/log-action.sh
+echo '{"brand":"...","platform":"...","kind":"run","skill":"social-health","note":"daily check"}' | bin/log-action.sh
 ```
+
+The second line is the scheduler marker — log it every run, healthy or not.
 
 State a verdict per account in plain words — healthy, watch, or parked — and say what
 you're basing it on. If anything is parked, lead the report with that.

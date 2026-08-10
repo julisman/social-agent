@@ -102,6 +102,13 @@ echo '{"brand":"...","platform":"...","kind":"dm_reply","author":"@...",
 
 ## Finish
 
+Record the run, **even if the inbox was empty** — `bin/due.sh` reads this to know when
+the skill last ran, and a run that found nothing still counts:
+
+```sh
+echo '{"brand":"...","platform":"...","kind":"run","skill":"social-dm","note":"threads handled"}' | bin/log-action.sh
+```
+
 Report: threads handled, how many handed off to WhatsApp, how many escalated (and what
 they were), and anything that came up repeatedly — a question asked five times in a
 week belongs in `BRAND.md` so it can be answered instantly next time.

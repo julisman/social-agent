@@ -94,6 +94,11 @@ messaged 2 hours ago" without opening it.
 
 ### Gotchas
 
+- **A click on the reply box can navigate away instead of focusing it.** Seen
+  2026-08-10: clicking `Balas ke <handle>...` loaded a *different* post entirely. The
+  tab title and URL change, so check them — if you type after that, you reply to the
+  wrong person. Re-navigate to the intended post and click again, further from any
+  link.
 - **The viewport resizes between screenshots** (1200x656 / 1416x840 / 1486x812 all seen
   in one session). Coordinates from an earlier screenshot go stale. Re-screenshot
   immediately before any click that matters.

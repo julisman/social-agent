@@ -112,6 +112,13 @@ echo '{"brand":"...","platform":"...","kind":"comment_reply","author":"@...",
 
 ## Finish
 
+Record the run, **even if the inbox was empty** — `bin/due.sh` reads this to know when
+the skill last ran, and a run that found nothing still counts:
+
+```sh
+echo '{"brand":"...","platform":"...","kind":"run","skill":"social-comments","note":"comments answered"}' | bin/log-action.sh
+```
+
 Report: comments answered per platform, anything escalated, and — most usefully — any
 question asked more than once. Repeats belong in `BRAND.md` under common questions, so
 the next one is answered instantly instead of researched.

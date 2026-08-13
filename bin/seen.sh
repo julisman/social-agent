@@ -8,9 +8,12 @@
 #
 # Two independent checks:
 #   post   — platform:post_id, never expires. Never reply to a post twice.
-#   author — platform:@handle, 30-day window, checked across ALL brands.
+#   author — platform:handle, 30-day window, checked across ALL brands.
 #            Three different businesses replying to one person is the clearest
 #            bot signal we can emit, so the author set is deliberately global.
+#
+# The handle is normalised (norm_handle) before it becomes a key. "@Handle" and
+# "handle" are the same person, and a gate that treats them as two is no gate.
 
 . "$(dirname "$0")/common.sh"
 
@@ -21,7 +24,7 @@ AUTHOR="$3"
   || die "usage: seen.sh <platform> <post_id> <author_handle>"
 
 POST_KEY="$PLATFORM:$POST_ID"
-AUTHOR_KEY="$PLATFORM:$AUTHOR"
+AUTHOR_KEY="$PLATFORM:$(norm_handle "$AUTHOR")"
 CUTOFF=$(( $(now_epoch) - AUTHOR_TTL_DAYS * 86400 ))
 
 [ -s "$DATA/seen.jsonl" ] || { echo "NEW"; exit 0; }

@@ -44,6 +44,19 @@ today()     { date +%Y-%m-%d; }
 # The single most important anti-spam rule in the project.
 AUTHOR_TTL_DAYS="$(cfg '.defaults.author_dedupe_days' 30)"
 
+# norm_handle <handle> — one spelling per person.
+#
+# Handles get written both ways ("@iamcahuu" from a screen, "iamcahuu" from a
+# URL) and the dedupe gate keys on the string, so two spellings of one person
+# are two different keys and the gate silently misses. Found 2026-08-10, after
+# a lead was written as "@israisyah_" while seen.jsonl held "israisyah_".
+#
+# Strips the leading @ and lowercases. Bare-and-lowercase is what the existing
+# seen.jsonl already holds, so every historical key still matches.
+norm_handle() {
+  printf '%s' "$1" | sed 's/^@//' | tr '[:upper:]' '[:lower:]'
+}
+
 # acct <brand> <platform> <field> — read one account field, empty if unset/null.
 #
 # Deliberately NOT `// empty`: jq's // treats `false` as absent, so `enabled: false`

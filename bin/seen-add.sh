@@ -11,6 +11,9 @@ PLATFORM="$1"; POST_ID="$2"; AUTHOR="$3"; BRAND="$4"
 [ -n "$PLATFORM" ] && [ -n "$POST_ID" ] && [ -n "$AUTHOR" ] && [ -n "$BRAND" ] \
   || die "usage: seen-add.sh <platform> <post_id> <author_handle> <brand>"
 
+# Must match seen.sh exactly, or we write a key the gate will never read.
+AUTHOR="$(norm_handle "$AUTHOR")"
+
 TS=$(now_iso)
 EPOCH=$(now_epoch)
 

@@ -129,6 +129,17 @@ bin/status.sh       # budget, today's actions, waiting leads, open escalations
 watch -n 30 bin/status.sh
 ```
 
+**Reading the daily reports:** `reports/*.md` is written in prose, not meant for a
+terminal. `bin/report-server.sh` renders it as a browsable local page:
+
+```sh
+bin/report-server.sh          # http://127.0.0.1:8787 — Ctrl+C to stop
+```
+
+Local-only by design — it binds to `127.0.0.1`, not the network, because reports carry
+customer names and phone numbers. Pages are re-rendered from disk on every request, so a
+report written mid-run shows up without restarting the server.
+
 **Pause without touching the loop:**
 
 ```sh

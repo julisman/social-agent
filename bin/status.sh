@@ -61,6 +61,15 @@ for b in $(jq -r '.brands | keys[]' "$CONFIG"); do
   if [ -f "$DATA/leads.jsonl" ]; then
     OPEN=$(jq -s --arg b "$b" '[ .[] | select(.brand==$b and .status=="collected") ] | length' "$DATA/leads.jsonl" 2>/dev/null)
     [ "$OPEN" != "0" ] && [ -n "$OPEN" ] && echo "  leads collected and not yet replied to: $OPEN"
+
+    # Products being sized before they can be answered. These are deliberately
+    # invisible to engage, which also makes them invisible here unless we ask —
+    # and a market you cannot see is a market you will forget you are measuring.
+    jq -rs --arg b "$b" '
+      [ .[] | select(.brand==$b and .status=="research") ]
+      | group_by(.product // "unspecified")[]
+      | "  research (\(.[0].product // "unspecified")): \(length) collected, \([.[]|select(.intent=="high")]|length) high"
+    ' "$DATA/leads.jsonl" 2>/dev/null
   fi
   echo
 done

@@ -42,6 +42,27 @@ both. Scroll 2-3 times with a wait between before capturing to load more than th
 If `find` returns links without `href`, re-run it with a narrower query naming the
 author ("timestamp permalink link inside <handle>'s post").
 
+**When `find` is unavailable, use `read_page` with `filter:"interactive"`.** Learned
+2026-08-11, when `find` failed all session on an API rate limit. `read_page` is not
+model-backed, so it keeps working, and the accessibility tree contains the same
+`/@handle/post/<POST_ID>` hrefs. It is a drop-in substitute for step 2.
+
+Two caveats:
+
+- **The tree only holds what is rendered.** Threads virtualises long lists and *unloads*
+  posts as you scroll past them, so a permalink visible in `get_page_text` may be absent
+  from the tree. Scrolling back can blank the column entirely — don't fight it.
+- **Better: pin the post with an author-scoped search.**
+
+  ```
+  https://www.threads.com/search?q=<term>&from_author=<handle>&serp_type=default
+  ```
+
+  The target post comes back first, with its permalink, no scrolling. This also doubles as
+  **the cheapest way to audit what our own account has replied to** — run it with
+  `from_author=motorin.bali` and every reply shows under the post it answers, which is how
+  the unlogged manual replies were found on 2026-08-11.
+
 ### Replying — the composer trap
 
 **Clicking the inline reply box sometimes opens a "Utas baru" (new thread) composer on
@@ -91,6 +112,30 @@ Sent messages appear right-aligned with a timestamp; `Dilihat` under one means s
 Timestamps in the thread list are relative (`14 menit`, `2 jam`, `1minggu`) and refer to
 the **last message in the thread**, which may be outbound — don't read "2 jam" as "they
 messaged 2 hours ago" without opening it.
+
+### Comments on our own posts — verified 2026-08-11
+
+`Aktivitas` in the sidebar defaults to **`Semua`**, which is mostly `Saran utas`
+(suggested threads) — other people's viral posts, not our notifications. It is noise and
+it buries the few real items.
+
+**Filter it.** Click the `Semua ▾` dropdown next to the `Aktivitas` heading and pick
+`Balasan`. That lands on a stable URL you can navigate to directly next time:
+
+```
+Replies to us:  https://www.threads.com/activity/replies
+Mentions:       Penyebutan in the same dropdown
+```
+
+Other dropdown options: `Mengikuti` · `Balasan` · `Penyebutan` · `Kutipan` ·
+`Postingan Ulang`.
+
+Reading the `Semua` list, note that a **pink heart badge on the avatar means a like**, and
+the text shown beside it is *our* post or reply that they liked — not something they wrote.
+Misreading that turns our own outbound copy into an imaginary inbound comment.
+
+Entries reading **"Balasan Anda dilihat lebih dari 50 kali"** are reach notifications on
+our own replies, not comments needing an answer.
 
 ### Gotchas
 
@@ -246,6 +291,15 @@ Hidden requests:  https://www.instagram.com/direct/requests/hidden/
 
 Tabs: `Primary` · `General` · `From ads` · `Permintaan` (requests).
 
+**Open `From ads` every run too — it is not optional.** Found 2026-08-11: that tab had
+never been read once, and held **nine leads from paid promotion**, eight of them ending in
+a bare "WA ya ka" with no number. Leads the business paid to acquire, killed by the rule-6
+habit, invisible because every instruction here pointed only at `Permintaan`. `General` has
+been empty both times it was checked; `From ads` is the one that hides volume.
+
+Note `Primary` lazy-loads: the first `get_page_text` showed 6 threads, scrolling revealed
+15. Don't conclude "the inbox is small" from one read.
+
 **Always open Permintaan and Permintaan Disembunyikan.** Cold inbound from non-followers
 lands there silently and is missed for weeks — the one real IG lead found on 2026-08-09
 had been sitting there 9 days after handing over a phone number. Instagram even
@@ -257,6 +311,20 @@ auto-labels these: *"Kami telah mengidentifikasi prospek"*.
 - **`Terima`** (accept) is not destructive, but it lets the sender call the account and
   see activity status. That's an account-reachability change: propose it, let the owner
   decide.
+
+### Comments on our own posts — verified 2026-08-11
+
+There is no Business-Suite-style aggregator. Use the notifications panel, and note it
+takes **two clicks** from the home feed: the first click on the heart only expands the
+sidebar and highlights `Notifikasi`, the second click on the label actually opens the
+panel. (Consistent with the existing note that the heart does nothing from
+`/your_activity/*` or `/direct/*` — start from the home feed.)
+
+The panel has filter chips: `Semua` · `Orang yang Anda ikuti` · **`Komentar`** ·
+`Mengikuti`. Pick `Komentar` — under `Semua`, comments are drowned in follow and like
+notifications.
+
+It is not a URL you can navigate to; it is a panel over the feed.
 
 Reading a request does **not** notify the sender, so triage is safe. Replying requires
 accepting first.
@@ -291,3 +359,132 @@ helps, but multi-account switchers inside the apps can still leave you as the wr
 Add dated notes here as things change.
 
 - TODO
+
+## Threads — `get_page_text` lies on the message-requests page (2026-08-10)
+
+`https://www.threads.com/messages/requests` returns only the empty-state placeholder
+("Pesan dari orang yang tidak Anda ikuti akan ditampilkan di sini") through
+`get_page_text`, even when the folder is full. The text extractor picks up the empty
+right-hand pane and misses the request list in the left column entirely.
+
+Reading it that way says "requests folder is empty" when it holds two dozen unanswered
+inquiries — the exact failure this folder already produced once. **Screenshot it.**
+
+The same page has a red `Delete 1` control at the bottom of the column. Never click it.
+
+## TikTok — Business Suite comments pane can mark-read without rendering (2026-08-10)
+
+`https://www.tiktok.com/business-suite/comments` lists videos with a `N komentar baru`
+count and a red dot. Clicking a row **cleared the dot and decremented the tab badge
+(4 → 3) while the right-hand pane stayed blank** — it showed "Please wait..." and never
+loaded. Clicking again did nothing; the row now reads "Tidak ada komentar baru".
+
+**The unread signal is destroyed and the comment is not readable from this view.** That
+is worse than a plain failure, because the surface now looks handled. If this happens,
+note the video title and date before moving on — that is the only way back to it.
+
+Fallback that day also failed: `tiktok.com/@<handle>` sat on "Please wait..." for 12s
+and then became a browser error page. Both are TikTok being slow or broken, **not a
+platform block** — no cooldown. Retry in a later run.
+
+Videos with comments still pending as of 14:55 WITA 2026-08-10:
+- "Jelajahi Bali dengan gaya! Vespa LX siap nemenin…" — 01/21/2026 — **badge lost to this bug**
+- "Bali feels better when you move freely 🌴 Captured…" — 01/07/2026 — 1 komentar baru
+- "📍Sewa Vespa LX di Bali? Gampang banget! Rent a…" — red dot
+
+**Reproduced 15:20 the same day, and it is not a transient.** On retry the pane *did*
+render — but only the video player and a `Tambah komentar…` box. **The comment list never
+appears at all**, and clicking a second row cleared that badge too (3 → 2). Two unread
+flags now lost this way.
+
+So the working procedure is: **do not click rows in this view.** Use `get_page_text`
+instead — it returns every video's full caption plus its `N komentar baru` state without
+clicking anything, which is enough to identify which videos need attention. Then answer
+them from the TikTok app (Aktivitas → Komentar), not from Business Suite.
+
+### Working route for TikTok comments (2026-08-10, 15:50)
+
+**Business Suite is still broken** — retested, pane blank after 16s, badge still decrements
+on click. **Do not use it to read or answer comments.**
+
+**Use the main app instead.** It was erroring earlier the same afternoon and came back:
+
+```
+tiktok.com/@<handle>  →  Aktivitas (left rail)  →  Komentar tab
+```
+
+That renders each comment's text, author and video thumbnail properly, and is the only
+route confirmed to work. Business Suite remains useful for **one** thing: `get_page_text`
+there returns every video's full caption plus `N komentar baru`, without clicking.
+
+**The two surfaces disagree.** Business Suite claimed 2 videos with new comments while
+the app's Komentar filter showed nothing newer than 7-19 under "Sebelumnya". Trust the
+app; the Business Suite counters have already been shown to be unreliable.
+
+## TikTok — a login modal on Business Suite is NOT a block (2026-08-10, 17:10)
+
+At 16:47 `business-suite/messages` rendered the full **"Masuk ke TikTok"** login modal
+(QR / phone / Facebook / Google / LINE, with "Terakhir dipakai" on the QR option). Read as
+a login challenge under CLAUDE.md rule 4, the account was parked for 24h.
+
+**It was a false positive.** Twenty minutes later the same URL loaded the inbox normally,
+still logged in, no re-authentication done by anyone. The modal was transient — of a piece
+with everything else this surface did that afternoon (comment pane blank, profile page
+erroring then recovering).
+
+**The cost was real:** the cooldown blocked a live customer who messaged during the park.
+
+**Test before parking.** A genuine block persists; TikTok's flakiness does not. Reload the
+URL once and wait ~10s before calling `cooldown.sh`. Signals that it is *not* a block:
+
+- Another site in the same Chrome profile is still authenticated (Instagram was)
+- The surface has been failing in unrelated ways the same session
+- A reload clears it
+
+A real login challenge survives a reload and usually appears on every TikTok URL, not one.
+
+## Instagram — inbound comments, VERIFIED route (2026-08-10, 18:20)
+
+The last unverified surface in the project. Two dead ends found first:
+
+- `instagram.com/your_activity/interactions/comments/` lists **our own outgoing**
+  comments, not inbound ones. Looks right, answers the wrong question.
+- The sidebar heart does nothing from `/your_activity/*` or `/direct/*` pages.
+
+**What works:**
+
+```
+instagram.com  →  Notifikasi (sidebar heart)  →  "Komentar" filter tab
+```
+
+It must be the **home feed** — the panel is an overlay the feed owns. On a collapsed
+sidebar the first click only expands the labels; click "Notifikasi" a second time to
+actually open it. Budget three clicks, not one.
+
+The Komentar tab then shows commenter, full text and post thumbnail. First read: five
+comments spanning Mar-May, all tags and compliments, none needing an answer.
+
+Worth knowing: `hafidaslams` publicly vouched for the account in a comment —
+*"yukkk sewa motornya di @motorin.bali trusted banget‼️"*. Organic advocacy like that is
+worth more than anything the agent can write, and it is invisible from every other view.
+
+## Threads — the reply composer silently drops the start of typed text (2026-08-11)
+
+Clicking the inline `Balas ke <handle>…` box and typing immediately **lost the opening
+clause**. The composer showed only the tail, and because it clips to four lines with the
+cursor at the end, the truncation is invisible in the collapsed box — the visible text
+looked like a complete sentence.
+
+Caught only by expanding the composer (⤢) before submitting. The reply would have gone
+out starting mid-sentence with an em-dash.
+
+**Two rules from this:**
+
+1. **Expand the composer (⤢) before every submit.** The collapsed box shows the last four
+   lines, not the whole reply. A screenshot of the collapsed box is not verification.
+2. **Focus, then type as a separate step.** The click that focuses the box swallows the
+   first characters typed in the same beat.
+
+The expanded view is also the safest place to check identity: it renders as a **"Balas"**
+modal quoting the post you are replying to, with your handle beneath. If that header ever
+says **"Utas baru"**, hit `Batal` — that is the original-post trap.

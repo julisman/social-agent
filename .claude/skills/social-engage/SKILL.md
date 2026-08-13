@@ -26,6 +26,15 @@ Read `data/leads.jsonl`, filter to this brand and platform with `status:"collect
 HIGH intent first, then MEDIUM if budget remains. Prefer the newest — a 6-hour-old post
 converts far better than a 6-day-old one.
 
+**`status:"collected"` is the whole filter — do not widen it.** Leads written as
+`status:"research"` belong to a product the brand kit cannot answer yet, and replying to
+one means pitching something you cannot describe. It also burns that author for 30 days
+under the dedupe rule, so the cost lands on the product that *is* ready.
+
+Check `product` before writing the reply. `motor`, `driver` and `jastip` are different
+businesses sharing one account, and a reply that answers the wrong one reads worse than
+no reply at all.
+
 ## The loop, per lead
 
 ```sh

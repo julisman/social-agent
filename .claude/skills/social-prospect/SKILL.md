@@ -143,8 +143,28 @@ more than a big one, because every bad lead becomes a reply to someone who didn'
 echo '{"platform":"threads","brand":"motor-sewa-bali","author":"@handle",
        "author_url":"https://...","post_url":"https://...","post_id":"abc123",
        "text":"<their exact words>","posted_at":"2026-08-09T03:12:00+0800",
-       "query":"sewa motor bali","intent":"high","language":"id"}' | bin/lead-add.sh
+       "query":"sewa motor bali","intent":"high","language":"id","product":"motor"}' | bin/lead-add.sh
 ```
+
+**Always set `product`** — `motor`, `driver`, or `jastip`. One account can sell several
+things and they convert nothing like each other; without this the lead list is a single
+undifferentiated pile and you cannot tell which market is actually there.
+
+### Products in market-research mode
+
+If `BRAND.md` cannot yet answer what the lead is asking — no fee, no turnaround, no
+shipping — the product is not repliable yet. **Collect it with `"status":"research"`.**
+
+```sh
+echo '{... ,"product":"jastip","intent":"high","status":"research"}' | bin/lead-add.sh
+```
+
+`social-engage` filters on `status=="collected"`, so a research lead cannot be replied to
+by accident. That is the point: the data shape enforces it, not your memory.
+
+**Currently in research mode: `jastip`** (owner is sizing the market first, 2026-08-10).
+Collect these exactly as carefully as repliable leads — the whole value is knowing
+whether the demand is real, so a sloppy jastip list answers the wrong question.
 
 Check `bin/seen.sh <platform> <post_id> <author>` as you go and mark already-seen
 candidates `"status":"skipped"` rather than dropping them silently — knowing the list

@@ -77,11 +77,21 @@ actually read the leads. That is the whole point of it.
 | `social-dm` | Answers the inbox, hands off to WhatsApp | No — private |
 | `social-comments` | Answers comments on **your own** posts | Yes — uncapped, no links |
 | `social-health` | Checks whether the account is being suppressed | No |
+| `social-insight` | One-off research: what people are saying about a topic, as a sourced report | No — read-only |
+| `social-watch` | Monitors standing watchlists (`watch/*.md`), surfaces only what's new | No — read-only |
 
 The split matters. Prospecting runs freely because it never speaks. Engaging is capped
 because it speaks to strangers. DMs and own-post comments are uncapped because answering
 someone who came to you is not a spam signal — but comments carry no link and DMs do,
 which is why they are separate skills rather than one.
+
+The last two are listeners, not funnel stages. `social-insight` answers a question once
+("what are people saying about jual BU?") with verbatim quotes and links.
+`social-watch` asks the same question every few hours forever and dedupes against
+`data/watch.jsonl`, so it only ever reports a listing once — a watch that repeats
+itself trains you to ignore it. Each watch is one file in `watch/` (template:
+`watch/_example.md`) holding its queries and, more importantly, its judgement rules —
+keyword match alone is never a hit.
 
 ## The guardrails
 
@@ -165,6 +175,10 @@ An empty inbox is still a run.
 
 `social-engage` deliberately has no schedule — it is triggered by prospecting finding
 something. On a clock it would just burn budget checks against an empty lead list.
+`social-insight` has none either: it answers a question when you ask one. `social-watch`
+is the opposite — monitoring only makes sense on the clock, so give it an
+`every_minutes` entry (a few hours is plenty; listings move slowly, and tighter
+intervals just spend the account's search activity finding nothing).
 
 ## Layout
 
@@ -177,13 +191,14 @@ brands/_example/       brand kit template
 brands/<slug>/         your real kits — GITIGNORED
 data/                  leads, dedupe keys, audit log — GITIGNORED
 reports/               daily reports, escalations — GITIGNORED
+watch/                 standing watchlists — GITIGNORED (template: watch/_example.md)
 runbook/               SAFETY.md, PLATFORM_NOTES.md
-.claude/skills/        the five skills
+.claude/skills/        the seven skills
 ```
 
-`config.json`, `brands/`, `data/` and `reports/` are all gitignored. Between them they
-hold every phone number, price, customer name and competitor note. Check `git status`
-before your first push.
+`config.json`, `brands/`, `data/`, `reports/` and `watch/` are all gitignored. Between
+them they hold every phone number, price, customer name, competitor note and thing you
+are quietly shopping for. Check `git status` before your first push.
 
 ## Honest limitations
 

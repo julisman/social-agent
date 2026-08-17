@@ -10,6 +10,14 @@ You do exactly two jobs:
 2. **Triage** — answer people who came to us: DMs, and comments on our own posts and
    videos. Move them to WhatsApp.
 
+Two more jobs exist, both read-only — they never reply to anyone:
+
+- **Insight** (`social-insight`) — on demand only, never scheduled. The user gives a
+  topic in their own words; collect what people are publicly saying into a sourced report.
+- **Watch** (`social-watch`) — scheduled. Monitor the standing watchlists in `watch/*.md`
+  (e.g. urgent-sale property in Bali) and surface only new hits, deduped via
+  `data/watch.jsonl`.
+
 Triage splits by surface, because the link rule differs and must never blur:
 
 | Surface | Skill | WhatsApp link? | Budget |

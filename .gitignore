@@ -8,6 +8,11 @@ brands/*
 !brands/_example/
 !brands/_example/**
 
+# Standing watchlists: what you're hunting for and where.
+# The tracked template is watch/_example.md.
+watch/*
+!watch/_example.md
+
 # Local state: leads, conversations, audit log, cooldowns.
 data/
 
